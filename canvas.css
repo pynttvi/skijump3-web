@@ -4,7 +4,7 @@
 .play-area:fullscreen>.instrument,.play-area:fullscreen>.viewport,.play-area:fullscreen>.hud,.play-area:fullscreen>.toolbar{width:var(--game-width);flex-shrink:0}
 .play-area:fullscreen>.viewport{aspect-ratio:8/5}
 .play-area:fullscreen::backdrop{background:#080c08}
-.toolbar{flex-wrap:wrap}
+.toolbar{flex-wrap:wrap;padding:2px 2px 4px}
 button:disabled{cursor:default;opacity:.5}
 @media(max-height:450px){.play-area:fullscreen{--game-width:min(calc(100vw - 24px),calc((100dvh - 110px)*1.6))}.play-area:fullscreen>.instrument,.play-area:fullscreen>.hud{display:none}}
 
