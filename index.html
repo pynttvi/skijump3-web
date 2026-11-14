@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ski Jump International 3 · Canvas port</title><link rel="stylesheet" href="canvas.css"></head>
+<body><div class="shell">
+<header class="masthead"><div><span class="eyebrow">SKI JUMP INTERNATIONAL 3 / CANVAS</span>
+<h1><span id="game-title">SKI JUMP INTERNATIONAL 3</span></h1><p><span id="game-description">Twenty original hills. One perfectly timed takeoff.</span></p></div>
+<div class="edition"><span class="dot"></span> CANVAS FIELD TEST <small><span id="game-edition">SOURCE-BASED CANVAS PORT</span></small></div></header>
+<main><section id="play-area" class="play-area" aria-label="Game">
+<div class="instrument"><div><small>OPERATOR</small><strong>PLAYER 01</strong></div><div><small>SECTOR</small><strong id="mission">Loading…</strong></div>
+<div class="state"><span class="dot"></span><strong id="status" aria-live="polite">Loading</strong></div></div>
+<div class="viewport"><canvas id="game" width="320" height="200" tabindex="0" aria-label="Game viewport"></canvas>
+<div id="overlay" class="overlay"><span class="eyebrow">MISSION BRIEF</span><h2 id="overlay-title">The hill is yours.</h2>
+<p id="overlay-note">Choose a hill, time your takeoff, and prepare your landing.</p><button id="start" class="primary">Start jumping <span>↗</span></button></div></div>
+<div class="hud"><div class="vitals"><small><span id="health-label">HEALTH</span> <b id="health-value">—</b></small><progress id="health" max="100" value="100"></progress></div>
+<div><small id="ammo-label">AMMO</small><strong id="ammo">—</strong></div><div><small id="enemies-label">ACTORS</small><strong id="enemies">—</strong></div>
+<div class="loadout"><small id="weapon-label">LOADOUT</small><strong id="weapon">—</strong></div><div><small>ELAPSED</small><strong id="timer">00:00</strong></div></div>
+<div class="toolbar"><button id="pause">Pause</button><button id="restart">Restart</button><button id="map" aria-pressed="false">Map</button><button id="fullscreen" aria-pressed="false">Fullscreen</button><button id="sound" aria-pressed="false">Enable sound</button></div>
+<p id="audio-status" class="audio-status" role="status" aria-live="polite">Sound off.</p>
+</section><aside><section class="panel"><span class="eyebrow">01 / DEPLOYMENT</span><h2>Choose your ground.</h2>
+<label for="level">Scene</label><select id="level"></select><p class="detail">Choose from twenty original hills.</p></section>
+<section class="panel controls"><span class="eyebrow">02 / FIELD MANUAL</span><h2>Your controls.</h2>
+<dl id="controls"></dl></section>
+<section class="prototype"><span class="eyebrow">RECONSTRUCTION IN PROGRESS</span><p>Source-based Canvas adaptation. Browser timing, RNG and input differ from DOS.</p>
+</section></aside></main>
+<footer><span>DOS PORT / NATIVE CANVAS 2D</span><span id="game-credits">SJ3 © Ville Könönen · GPL-3.0</span><span><a href="THIRD_PARTY_NOTICES.md">Credits &amp; license</a> · <a href="skijump3-source.tar.gz">Source code</a></span></footer>
+</div><script type="module" src="ui.js"></script></body></html>

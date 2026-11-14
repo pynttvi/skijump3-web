@@ -1,0 +1,14 @@
+{
+  "status": "built",
+  "hills": 20,
+  "animations": 177,
+  "source_digest": "4c6f02dcaddd86d0511418ceb666c45929f270444e8a9c1e8219521a285dadfb",
+  "repository": "https://github.com/suomipelit/skijump3",
+  "commit": "ba1d5035af483a2c575bb38af64de61322d7e2a5",
+  "profile_checksums_verified": true,
+  "limitations": [
+    "Fixed 70Hz browser scheduling and xorshift RNG differ from DOS timing and Random.",
+    "No measured DOS runtime parity. Menus, cups, multiplayer, injuries and original replay files are not ported.",
+    "Outrun/crash presentation and browser input handling are adapted; synthesized audio is new."
+  ]
+}

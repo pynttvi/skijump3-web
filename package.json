@@ -1,0 +1,16 @@
+{
+  "name": "skijump3-canvas",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0",
+  "scripts": {
+    "start": "node serve.mjs",
+    "dev": "node serve.mjs",
+    "verify": "node verify.mjs dist",
+    "test": "node --check game.js && node --check simulation.js && node --check ui.js && node verify.mjs .",
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

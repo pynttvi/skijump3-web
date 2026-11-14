@@ -1,0 +1,3 @@
+# Preserve original source encodings and binary asset hashes.
+source/** -text -diff
+CREDITS.TXT -text -diff
