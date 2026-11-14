@@ -6,7 +6,7 @@ import {gzipSync} from 'node:zlib';
 const root=path.resolve(import.meta.dirname,'..'),output=path.join(root,'dist');
 if(fs.existsSync(output)&&fs.lstatSync(output).isSymbolicLink())throw new Error('dist must not be a symlink');
 fs.rmSync(output,{recursive:true,force:true});fs.mkdirSync(output,{recursive:true});
-for(const name of ["assets","source","index.html","canvas.css","game.js","simulation.js","ui.js","serve.mjs","verify.mjs","package.json","README.md","COPYING","CREDITS.TXT","THIRD_PARTY_NOTICES.md","asset-provenance.json","build-report.json"])fs.cpSync(path.join(root,name),path.join(output,name),{recursive:true});
+for(const name of ["assets","source","index.html","canvas.css","game.js","graphics.js","simulation.js","ui.js","serve.mjs","verify.mjs","package.json","README.md","COPYING","CREDITS.TXT","THIRD_PARTY_NOTICES.md","asset-provenance.json","build-report.json"])fs.cpSync(path.join(root,name),path.join(output,name),{recursive:true});
 fs.writeFileSync(path.join(output,'.nojekyll'),'');
 const archive=[];
 function addSource(name) {
@@ -26,7 +26,7 @@ function addSource(name) {
   header.write(checksum.toString(8).padStart(6,'0')+'\0 ',148,8,'ascii');
   archive.push(header,data,Buffer.alloc((512-data.length%512)%512));
 }
-for(const name of ["assets","source","scripts",".github",".gitignore",".gitattributes","index.html","canvas.css","game.js","simulation.js","ui.js","serve.mjs","verify.mjs","package.json","README.md","COPYING","CREDITS.TXT","THIRD_PARTY_NOTICES.md","asset-provenance.json","build-report.json"])addSource(name);
+for(const name of ["assets","source","scripts","tests",".github",".gitignore",".gitattributes","index.html","canvas.css","game.js","graphics.js","simulation.js","ui.js","serve.mjs","verify.mjs","package.json","README.md","COPYING","CREDITS.TXT","THIRD_PARTY_NOTICES.md","asset-provenance.json","build-report.json"])addSource(name);
 archive.push(Buffer.alloc(1024));
 fs.writeFileSync(path.join(output,'skijump3-source.tar.gz'),gzipSync(Buffer.concat(archive)));
 

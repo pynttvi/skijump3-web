@@ -1,4 +1,5 @@
 // GPL-3.0, browser presentation around the translated SJ3 simulation.
+import {loadGraphics,applyGraphics,drawGraphic} from './graphics.js';
 import {STEP,createJump,stepJump,assistInput,clamp,ground,round} from './simulation.js';
 const scene=await fetch('./assets/scene.json').then(r=>{if(!r.ok)throw new Error('Missing hill data');return r.json();});
 export const metadata={title:'SKI JUMP INTERNATIONAL 3',description:'Twenty original hills. One perfectly timed takeoff.',
@@ -10,6 +11,7 @@ function loadImage(file){return new Promise((resolve,reject)=>{const image=new I
 export function createGame(canvas){
  const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
  const $=id=>document.getElementById(id),keys=new Set();let pending={},heldTicks=0;
+ let graphicsScale=1,currentInfo=null;
  let hill=null,state=null,front=null,back=null,atlas=null,loading=false,error=null,token=0,paused=false,accumulator=0,overview=false;
  let results=[],frames=[],lastReplay=[],replayIndex=-1,recorded=false,assistedUsed=false,roundNumber=1,seed=1000;
  let audio=null,gain=null,oscillator=null,sound=false;
@@ -37,6 +39,26 @@ export function createGame(canvas){
   button.onpointerup=button.onpointercancel=button.onlostpointercapture=()=>keys.delete(key);touch.append(button);
  }
  $('play-area').append(touch);
+ const graphicsButton=document.createElement('button');graphicsButton.textContent='Upscaled graphics: off';graphicsButton.setAttribute('aria-pressed','false');
+ $('play-area').querySelector('.toolbar').append(graphicsButton);
+ function installGraphics(graphics){
+  ({front,back,atlas}=graphics);graphicsScale=graphics.scale;applyGraphics(canvas,ctx,graphics);
+  graphicsButton.textContent='Upscaled graphics: '+(graphicsScale===4?'on':'off');
+  graphicsButton.setAttribute('aria-pressed',String(graphicsScale===4));graphicsButton.title='';
+ }
+ graphicsButton.onclick=async()=>{
+  if(!hill||loading)return;
+  canvas.focus();
+  const request=++token,scale=graphicsScale===1?4:1;
+  graphicsButton.disabled=true;graphicsButton.textContent='Loading graphics…';
+  try{
+   const graphics=await loadGraphics(currentInfo,scale,loadImage);
+   if(request===token)installGraphics(graphics);
+  }catch(reason){if(request===token){graphicsButton.textContent='Graphics unavailable — retry';graphicsButton.title=reason.message;}}
+  finally{if(request===token)graphicsButton.disabled=false;}
+ };
+ graphicsButton.disabled=true;
+
  function clearInput(){keys.clear();pending={};heldTicks=0;}
  window.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA','BUTTON'].includes(e.target?.tagName))return;
@@ -52,13 +74,13 @@ export function createGame(canvas){
   next.disabled=true;replay.disabled=true;score.textContent='';sessionText();canvas.focus();
  }
  async function load(id){
-  const request=++token;loading=true;error=null;state=null;results=[];roundNumber=1;next.disabled=true;replay.disabled=true;
+  const request=++token;graphicsButton.disabled=true;loading=true;error=null;state=null;results=[];roundNumber=1;next.disabled=true;replay.disabled=true;
   const info=scene.hills.find(h=>h.id===id)??scene.hills[0];
   try{
-   const [response,f,b,a]=await Promise.all([fetch(`./assets/hills/${info.id}.json`),loadImage(info.frontFile),loadImage(info.backFile),loadImage('animations.png')]);
+   const [response,graphics]=await Promise.all([fetch(`./assets/hills/${info.id}.json`),loadGraphics(info,graphicsScale,loadImage)]);
    if(!response.ok)throw new Error('Missing hill profile');const data=await response.json();
    if(request!==token)return;
-   hill=data;front=f;back=b;atlas=a;loading=false;begin();
+   hill=data;currentInfo=info;installGraphics(graphics);graphicsButton.disabled=false;loading=false;begin();
   }catch(reason){if(request===token){loading=false;error=reason.message;$('status').textContent=error;}}
  }
  next.onclick=()=>{if(!state?.result)return;if(results.length>=2){results=[];roundNumber=1;}else roundNumber=2;begin();};
@@ -71,7 +93,7 @@ export function createGame(canvas){
   try{const key=`sj3-canvas-best-${hill.id}-${assistedUsed?'assisted':'manual'}-${state.calm?'calm':'wind'}`,old=Number(localStorage.getItem(key)||0);if(r.points>old){localStorage.setItem(key,String(r.points));score.textContent+=' New local best!';}}catch{}
  }
  function snapshot(){return {x:state.x,y:state.y,body:state.body,skis:state.skis,phase:state.phase,height:state.height,distance:state.distance,angle:state.angle,px:state.px,wind:state.wind.value,result:state.result};}
- function sprite(frame,x,y){const s=scene.animations[frame];if(!s)return;ctx.drawImage(atlas,s.x,s.y,s.width,s.height,round(x)-s.cx,round(y)-s.cy,s.width,s.height);}
+ function sprite(frame,x,y){const s=scene.animations[frame];if(!s)return;drawGraphic(ctx,atlas,graphicsScale,s.x,s.y,s.width,s.height,round(x)-s.cx,round(y)-s.cy,s.width,s.height);}
  function text(label,x,y,color='#ffffff',size=7){ctx.fillStyle=color;ctx.font=`${size}px monospace`;ctx.fillText(label,x,y);}
  function draw(){
   ctx.fillStyle='#17182a';ctx.fillRect(0,0,320,200);ctx.textAlign='left';
@@ -80,12 +102,12 @@ export function createGame(canvas){
   const camera={x:clamp(round(view.x)-135,0,704),y:clamp(round(view.y)-100,0,312)};
   if(overview){
    // Full foreground plus the background at half-scroll is a diagnostic overview.
-   ctx.drawImage(back,0,0,1024,400,0,0,320,200);ctx.drawImage(front,0,0,1024,512,0,0,320,200);
+   drawGraphic(ctx,back,graphicsScale,0,0,1024,400,0,0,320,200);drawGraphic(ctx,front,graphicsScale,0,0,1024,512,0,0,320,200);
    ctx.fillStyle='#ffc775';ctx.fillRect(view.x/1024*320-1,view.y/512*200-1,3,3);
    text(`${hill.name} · K${hill.k} · overview`,8,14,'#ffc775');return;
   }
-  ctx.drawImage(back,Math.floor(camera.x/2),Math.floor(camera.y/2),320,200,0,0,320,200);
-  ctx.drawImage(front,camera.x,camera.y,320,200,0,0,320,200);
+  drawGraphic(ctx,back,graphicsScale,Math.floor(camera.x/2),Math.floor(camera.y/2),320,200,0,0,320,200);
+  drawGraphic(ctx,front,graphicsScale,camera.x,camera.y,320,200,0,0,320,200);
   const x=view.x-camera.x,y=view.y-camera.y;
   sprite(view.body,x,y-2);sprite(view.skis,x,y-1);
   ctx.fillStyle='#101020b8';ctx.fillRect(0,0,320,22);

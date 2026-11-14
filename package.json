@@ -7,7 +7,7 @@
     "start": "node serve.mjs",
     "dev": "node serve.mjs",
     "verify": "node verify.mjs dist",
-    "test": "node --check game.js && node --check simulation.js && node --check ui.js && node verify.mjs .",
+    "test": "node --test tests/graphics.test.mjs && node --check game.js && node --check simulation.js && node --check ui.js && node verify.mjs .",
     "build": "node scripts/build.mjs"
   },
   "engines": {
