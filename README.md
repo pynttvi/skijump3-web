@@ -42,6 +42,6 @@ The build includes a downloadable corresponding-source archive and preserved
 public GPL originals under source/upstream/. No npm installation is required.
 Browser sound/fullscreen and measured DOS runtime parity remain unverified.
 
-Use **Upscaled graphics: off/on** in the game toolbar to switch between original
-and 4x nearest-neighbor graphics without restarting the jump. The complete set
+Use **Upscaled graphics: off/on** next to **Enable sound** to switch between original
+and 4x nearest-neighbor graphics without restarting the jump. You can also choose the mode before starting. The complete set
 is in assets/upscaled/nearest-4x; AI test crops are not game-ready assets.

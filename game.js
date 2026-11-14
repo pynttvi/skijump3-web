@@ -39,15 +39,19 @@ export function createGame(canvas){
   button.onpointerup=button.onpointercancel=button.onlostpointercapture=()=>keys.delete(key);touch.append(button);
  }
  $('play-area').append(touch);
- const graphicsButton=document.createElement('button');graphicsButton.textContent='Upscaled graphics: off';graphicsButton.setAttribute('aria-pressed','false');
- $('play-area').querySelector('.toolbar').append(graphicsButton);
+ const graphicsButton=$('graphics');
  function installGraphics(graphics){
   ({front,back,atlas}=graphics);graphicsScale=graphics.scale;applyGraphics(canvas,ctx,graphics);
   graphicsButton.textContent='Upscaled graphics: '+(graphicsScale===4?'on':'off');
   graphicsButton.setAttribute('aria-pressed',String(graphicsScale===4));graphicsButton.title='';
  }
  graphicsButton.onclick=async()=>{
-  if(!hill||loading)return;
+  if(loading)return;
+  if(!hill){
+   graphicsScale=graphicsScale===1?4:1;
+   graphicsButton.textContent='Upscaled graphics: '+(graphicsScale===4?'on':'off');
+   graphicsButton.setAttribute('aria-pressed',String(graphicsScale===4));return;
+  }
   canvas.focus();
   const request=++token,scale=graphicsScale===1?4:1;
   graphicsButton.disabled=true;graphicsButton.textContent='Loading graphics…';
@@ -57,7 +61,6 @@ export function createGame(canvas){
   }catch(reason){if(request===token){graphicsButton.textContent='Graphics unavailable — retry';graphicsButton.title=reason.message;}}
   finally{if(request===token)graphicsButton.disabled=false;}
  };
- graphicsButton.disabled=true;
 
  function clearInput(){keys.clear();pending={};heldTicks=0;}
  window.addEventListener('keydown',e=>{

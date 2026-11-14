@@ -3,10 +3,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {gzipSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
 const root=path.resolve(import.meta.dirname,'..'),output=path.join(root,'dist');
 if(fs.existsSync(output)&&fs.lstatSync(output).isSymbolicLink())throw new Error('dist must not be a symlink');
 fs.rmSync(output,{recursive:true,force:true});fs.mkdirSync(output,{recursive:true});
 for(const name of ["assets","source","index.html","canvas.css","game.js","graphics.js","simulation.js","ui.js","serve.mjs","verify.mjs","package.json","README.md","COPYING","CREDITS.TXT","THIRD_PARTY_NOTICES.md","asset-provenance.json","build-report.json"])fs.cpSync(path.join(root,name),path.join(output,name),{recursive:true});
+// A single content revision keeps HTML, CSS and the module graph fresh together.
+const modules=['ui.js','game.js','graphics.js','simulation.js'];
+const revision=createHash('sha256').update(Buffer.concat([...modules,'index.html','canvas.css'].map(name=>fs.readFileSync(path.join(root,name))))).digest('hex').slice(0,12);
+for(const name of modules){
+ const text=fs.readFileSync(path.join(root,name),'utf8').replace(/(from\s+['"]\.\/)([^'"]+\.js)(['"])/g,'$1$2?v='+revision+'$3');
+ fs.writeFileSync(path.join(output,name),text);
+}
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8').replace('src="ui.js"','src="ui.js?v='+revision+'"').replace('href="canvas.css"','href="canvas.css?v='+revision+'"');
+fs.writeFileSync(path.join(output,'index.html'),html);
 fs.writeFileSync(path.join(output,'.nojekyll'),'');
 const archive=[];
 function addSource(name) {
